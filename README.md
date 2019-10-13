@@ -17,9 +17,11 @@ Python, openCV, PyGame requried.
 ### How to use
 Download the files and run python main.py. Use the two objects (red and green) as moving walls to play the table hockey.
 <br/><br/><br/>
+![IMAGE](d4.png)
 ![IMAGE](d1.png)
 ![IMAGE](d2.png)
 ![IMAGE](d3.png)
+
  
 
 
