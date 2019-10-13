@@ -79,8 +79,10 @@ def main():
                 exit(0)
             cursor_loc = msg
 
-        player_g.relocate(player_g.x, cursor_loc[1] * screen_height)
-        player_r.relocate(player_r.x, cursor_loc[3] * screen_height)
+        gx = max(screen_width / 2, cursor_loc[0] * screen_width)
+        rx = min(screen_width / 2, cursor_loc[2] * screen_width)
+        player_g.relocate(gx, cursor_loc[1] * screen_height)
+        player_r.relocate(rx, cursor_loc[3] * screen_height)
 
         time_passed = clock.tick()
         seconds = time_passed / 1000.0
