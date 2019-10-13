@@ -24,7 +24,7 @@ Download the files and run python main.py. Use the two objects (red and green) a
 
 
 ## Authors
-Leo Chan, Daniel Huang, Harry Liu, Vicent Chen - Student at UNC-Chapel Hill, USA
+Leo Chan, Daniel Huang, Harry Liu, Vicent Chen - Students at UNC-Chapel Hill, USA
 <br/>
 (Jingyuan Chen, Tenghao Huang, Yufan Liu, Zihong Chen)
 
