@@ -191,17 +191,17 @@ def main_a(pipe):
 		pts_red.appendleft(center_red)
 
 		# loop over the set of tracked points
-		for i in range(1, len(pts_green)):
-			# if either of the tracked points are None, ignore
-			# them
-			if pts_green[i - 1] is None or pts_green[i] is None:
-				continue
-
-			# otherwise, compute the thickness of the line and
-			# draw the connecting lines
-			thickness = int(np.sqrt(args["buffer"] / float(i + 1)) * 2.5)
-			cv2.line(frame, pts_green[i - 1], pts_green[i], (0, 0, 255), thickness)
-				
+		# for i in range(1, len(pts_green)):
+		# 	# if either of the tracked points are None, ignore
+		# 	# them
+		# 	if pts_green[i - 1] is None or pts_green[i] is None:
+		# 		continue
+		#
+		# 	# otherwise, compute the thickness of the line and
+		# 	# draw the connecting lines
+		# 	thickness = int(np.sqrt(args["buffer"] / float(i + 1)) * 2.5)
+		# 	cv2.line(frame, pts_green[i - 1], pts_green[i], (0, 0, 255), thickness)
+		#
 		# # show the frame to our screen
 		# cv2.imshow("Frame", frame)
 		# key = cv2.waitKey(1) & 0xFF
@@ -210,19 +210,19 @@ def main_a(pipe):
 		# if key == ord("q"):
 		# 	break
 
-		for j in range(1, len(pts_red)):
-			# if either of the tracked points are None, ignore
-			# them
-			if pts_red[j - 1] is None or pts_red[j] is None:
-				continue
-
-			# otherwise, compute the thickness of the line and
-			# draw the connecting lines
-			thickness1 = int(np.sqrt(args["buffer"] / float(j + 1)) * 2.5)
-			cv2.line(frame, pts_red[j - 1], pts_red[j], (0, 0, 255), thickness1)
-
-		# show the frame to our screen
-		cv2.imshow("Frame", frame)
+		# for j in range(1, len(pts_red)):
+		# 	# if either of the tracked points are None, ignore
+		# 	# them
+		# 	if pts_red[j - 1] is None or pts_red[j] is None:
+		# 		continue
+		#
+		# 	# otherwise, compute the thickness of the line and
+		# 	# draw the connecting lines
+		# 	thickness1 = int(np.sqrt(args["buffer"] / float(j + 1)) * 2.5)
+		# 	cv2.line(frame, pts_red[j - 1], pts_red[j], (0, 0, 255), thickness1)
+		#
+		# # show the frame to our screen
+		# cv2.imshow("Frame", frame)
 		key = cv2.waitKey(1) & 0xFF
 
 		# if the 'q' key is pressed, stop the loop

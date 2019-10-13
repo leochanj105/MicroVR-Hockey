@@ -7,7 +7,8 @@ def normal_obstacles(split):
 
 class Sprite:
     fps = 0.04
-    def __init__(self, width, height, speed, acceleration, images, x, y, screen):
+    max_speed = 900
+    def __init__(self, width, height, speed, acceleration, images, x, y, screen, bound):
         self.width = width
         self.height = height
         self.speed_x = speed[0]
@@ -23,7 +24,9 @@ class Sprite:
         self.current_frame = 0
         self.frame_count = len(images)
         self.cum_secs = 0.0
-        self.lock = False
+        self.lock = True
+        self.bound = bound
+        print(bound)
     def render(self):
         self.screen.blit(self.images[self.current_frame], (self.x, self.y), (0, 0, self.width, self.height))
 
@@ -36,14 +39,26 @@ class Sprite:
     def move(self, interval):
         self.speed_x += self.acc_x * interval
         self.speed_y += self.acc_y * interval
+
         self.x += self.speed_x * interval
         self.y += self.speed_y * interval
+
+
+        # if(self.speed_x >= Sprite.max_speed or self.speed_x <= 0):
+        #     self.acc_x = 0
+        # if (self.speed_y >= Sprite.max_speed or self.speed_y <= 0):
+        #     self.acc_ya = 0
         if(not self.lock):
             self.cum_secs += interval
             if(self.cum_secs >= Sprite.fps):
                 self.cum_secs = 0
                 self.current_frame = (self.current_frame + 1) % self.frame_count
 
+    def stop(self):
+        self.speed_x = 0
+        self.speed_y = 0
+        self.acc_x = 0
+        self.acc_y = 0
     def setLock(self):
         self.lock = True
     def releaseLock(self):
@@ -55,6 +70,7 @@ class Sprite:
     def scale(self, scale):
         self.width = self.width * scale
         self.height = self.height * scale
+
 
 
 
