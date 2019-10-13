@@ -26,7 +26,12 @@ def main_a(pipe):
 	# list of tracked points
 	greenLower = (29, 86, 6)
 	greenUpper = (64, 255, 255)
-	pts = deque(maxlen=args["buffer"])
+
+	redLower = (169, 100, 100)
+	redUpper = (189, 255, 255)
+
+	pts_green = deque(maxlen=args["buffer"])
+	pts_red = deque(maxlen=args["buffer"])
 
 	# if a video path was not supplied, grab the reference
 	# to the webcam
@@ -41,6 +46,11 @@ def main_a(pipe):
 	# allow the camera or video file to warm up
 	time.sleep(2.0)
 
+	center_green_x_pos = 0.0
+	center_green_y_pos = 0.0
+	center_red_x_pos = 0.0
+	center_red_y_pos = 0.0
+
 	# keep looping
 	while True:
 		time.sleep(0.001)
@@ -52,7 +62,7 @@ def main_a(pipe):
 		frame = vs.read()
 
 		# handle the frame from VideoCapture or VideoStream
-		frame = frame[1] if args.get("video", False) else frame
+		frame = frame[1] if args.get("video", False) else frameq
 
 		# if we are viewing a video and we did not grab a frame,
 		# then we have reached the end of the video
@@ -67,60 +77,149 @@ def main_a(pipe):
 		blurred = cv2.GaussianBlur(frame, (11, 11), 0)
 		hsv = cv2.cvtColor(blurred, cv2.COLOR_BGR2HSV)
 
-		# construct a mask for the color "green", then perform
+		# construct a mask_green for the color "green", then perform
 		# a series of dilations and erosions to remove any small
-		# blobs left in the mask
-		mask = cv2.inRange(hsv, greenLower, greenUpper)
-		mask = cv2.erode(mask, None, iterations=2)
-		mask = cv2.dilate(mask, None, iterations=2)
+		# blobs left in the mask_green
+		mask_green = cv2.inRange(hsv, greenLower, greenUpper)
+		mask_green = cv2.erode(mask_green, None, iterations=2)
+		mask_green = cv2.dilate(mask_green, None, iterations=2)
 
-		# find contours in the mask and initialize the current
-		# (x, y) center of the ball
-		cnts = cv2.findContours(mask.copy(), cv2.RETR_EXTERNAL,
+		mask_red = cv2.inRange(hsv, redLower, redUpper)
+		mask_red = cv2.erode(mask_red, None, iterations=2)
+		mask_red = cv2.dilate(mask_red, None, iterations=2)
+
+
+		# find contours in the mask_green and initialize the current
+		# (x, y) center_green of the ball
+		cnts_green = cv2.findContours(mask_green.copy(), cv2.RETR_EXTERNAL,
 			cv2.CHAIN_APPROX_SIMPLE)
-		cnts = imutils.grab_contours(cnts)
-		center = None
+		cnts_green = imutils.grab_contours(cnts_green)
+		center_green = None
+
+		cnts_red = cv2.findContours(mask_red.copy(), cv2.RETR_EXTERNAL,
+			cv2.CHAIN_APPROX_SIMPLE)
+		cnts_red = imutils.grab_contours(cnts_red)
+		center_red = None
 
 		# only proceed if at least one contour was found
-		if len(cnts) > 0:
-			# find the largest contour in the mask, then use
+		if (len(cnts_green) > 0 and len(cnts_red) > 0):
+			# find the largest contour in the mask_green, then use
 			# it to compute the minimum enclosing circle and
 			# centroid
-			c = max(cnts, key=cv2.contourArea)
+			c = max(cnts_green, key=cv2.contourArea)
 			((x, y), radius) = cv2.minEnclosingCircle(c)
 			M = cv2.moments(c)
-			center = (int(M["m10"] / M["m00"]), int(M["m01"] / M["m00"]))
-			x_pos = 1.0 - center[0] / 600
-			y_pos = center[1] / 340
-			x_pos = min(max(0.0, x_pos), 1.0)
-			y_pos = min(max(0.0, y_pos), 1.0)
-			pipe.send((x_pos, y_pos))
+			center_green = (int(M["m10"] / M["m00"]), int(M["m01"] / M["m00"]))
 
-			# pipe.send((x_pos, y_pos))
+			center_green_x_pos = 1.0 - center_green[0] / 600
+			center_green_y_pos = center_green[1] / 340
+			center_green_x_pos = min(max(0.0, center_green_x_pos), 1.0)
+			center_green_y_pos = min(max(0.0, center_green_y_pos), 1.0)
+
+			d = max(cnts_red, key=cv2.contourArea)
+			((x1, y1), radius1) = cv2.minEnclosingCircle(d)
+			N = cv2.moments(d)
+			center_red = (int(N["m10"] / N["m00"]), int(N["m01"] / N["m00"]))
+			
+			center_red_x_pos = 1.0 - center_red[0] / 600
+			center_red_y_pos = center_red[1] / 340
+			center_red_x_pos = min(max(0.0, center_red_x_pos), 1.0)
+			center_red_y_pos = min(max(0.0, center_red_y_pos), 1.0)
+
+			pipe.send((center_green_x_pos, center_green_y_pos, center_red_x_pos, center_red_y_pos))
+
+
 			# only proceed if the radius meets a minimum size
 			if radius > 10:
 				# draw the circle and centroid on the frame,
 				# then update the list of tracked points
 				cv2.circle(frame, (int(x), int(y)), int(radius),
 					(0, 255, 255), 2)
-				cv2.circle(frame, center, 5, (0, 0, 255), -1)
+				cv2.circle(frame, center_green, 5, (0, 0, 255), -1)
+
+			if radius1 > 10:
+				cv2.circle(frame, (int(x1), int(y1)), int(radius1),
+					(0, 255, 255), 2)
+				cv2.circle(frame, center_red, 5, (0, 0, 255), -1)
+
+		elif (len(cnts_green) > 0 and not (len(cnts_red) > 0)):
+			# find the largest contour in the mask_green, then use
+			# it to compute the minimum enclosing circle and
+			# centroid
+			c = max(cnts_green, key=cv2.contourArea)
+			((x, y), radius) = cv2.minEnclosingCircle(c)
+			M = cv2.moments(c)
+			center_green = (int(M["m10"] / M["m00"]), int(M["m01"] / M["m00"]))
+
+			center_green_x_pos = 1.0 - center_green[0] / 600
+			center_green_y_pos = center_green[1] / 340
+			center_green_x_pos = min(max(0.0, center_green_x_pos), 1.0)
+			center_green_y_pos = min(max(0.0, center_green_y_pos), 1.0)
+
+			pipe.send((center_green_x_pos, center_green_y_pos, center_red_x_pos, center_red_y_pos))
+
+			# only proceed if the radius meets a minimum size
+			if radius > 10:
+				# draw the circle and centroid on the frame,
+				# then update the list of tracked points
+				cv2.circle(frame, (int(x), int(y)), int(radius),
+						   (0, 255, 255), 2)
+				cv2.circle(frame, center_green, 5, (0, 0, 255), -1)
+
+		elif (len(cnts_red) > 0 and not (len(cnts_green) > 0)):
+
+			d = max(cnts_red, key=cv2.contourArea)
+			((x1, y1), radius1) = cv2.minEnclosingCircle(d)
+			N = cv2.moments(d)
+			center_red = (int(N["m10"] / N["m00"]), int(N["m01"] / N["m00"]))
+
+			center_red_x_pos = 1.0 - center_red[0] / 600
+			center_red_y_pos = center_red[1] / 340
+			center_red_x_pos = min(max(0.0, center_red_x_pos), 1.0)
+			center_red_y_pos = min(max(0.0, center_red_y_pos), 1.0)
+
+			pipe.send((center_green_x_pos, center_green_y_pos, center_red_x_pos, center_red_y_pos))
+
+			if radius1 > 10:
+				cv2.circle(frame, (int(x1), int(y1)), int(radius1),
+						   (0, 255, 255), 2)
+				cv2.circle(frame, center_red, 5, (0, 0, 255), -1)
 
 		# update the points queue
-		pts.appendleft(center)
+		pts_green.appendleft(center_green)
+
+		pts_red.appendleft(center_red)
 
 		# loop over the set of tracked points
-		for i in range(1, len(pts)):
+		for i in range(1, len(pts_green)):
 			# if either of the tracked points are None, ignore
 			# them
-			if pts[i - 1] is None or pts[i] is None:
+			if pts_green[i - 1] is None or pts_green[i] is None:
 				continue
 
 			# otherwise, compute the thickness of the line and
 			# draw the connecting lines
 			thickness = int(np.sqrt(args["buffer"] / float(i + 1)) * 2.5)
-			cv2.line(frame, pts[i - 1], pts[i], (0, 0, 255), thickness)
+			cv2.line(frame, pts_green[i - 1], pts_green[i], (0, 0, 255), thickness)
+				
+		# # show the frame to our screen
+		# cv2.imshow("Frame", frame)
+		# key = cv2.waitKey(1) & 0xFF
 
+		# # if the 'q' key is pressed, stop the loop
+		# if key == ord("q"):
+		# 	break
 
+		for j in range(1, len(pts_red)):
+			# if either of the tracked points are None, ignore
+			# them
+			if pts_red[j - 1] is None or pts_red[j] is None:
+				continue
+
+			# otherwise, compute the thickness of the line and
+			# draw the connecting lines
+			thickness1 = int(np.sqrt(args["buffer"] / float(j + 1)) * 2.5)
+			cv2.line(frame, pts_red[j - 1], pts_red[j], (0, 0, 255), thickness1)
 
 		# show the frame to our screen
 		cv2.imshow("Frame", frame)
@@ -128,7 +227,6 @@ def main_a(pipe):
 
 		# if the 'q' key is pressed, stop the loop
 		if key == ord("q"):
-			pipe.send("OVER")
 			break
 
 	# if we are not using a video file, stop the camera video stream

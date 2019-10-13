@@ -43,7 +43,11 @@ if __name__ == "__main__":
     floor_image = pygame.image.load('background.gif').convert()
     floor = Sprite(screen_width, floor_height, [0, 0], [0, 0], [floor_image], 0, base , screen)
 
+    cursor_g_image = pygame.image.load('cursor_g.gif').convert()
+    cursor_g = Sprite(8,8,[0,0],[0,0],[cursor_g_image], 0,0,screen)
 
+    cursor_r_image = pygame.image.load('cursor_r.gif').convert()
+    cursor_r = Sprite(8, 8, [0, 0], [0, 0], [cursor_r_image], 0, 0, screen)
 
     obstacles = []
     obstacles
@@ -60,7 +64,7 @@ if __name__ == "__main__":
     # detector_proc = Process(target = detector, args = (write_end,))
     # detector_proc.start()
 
-    cursor = (0,0)
+    cursor_loc = (0,0,0,0)
 
 
     while(True):
@@ -98,8 +102,12 @@ if __name__ == "__main__":
             msg = read_end.recv()
             if(msg == "OVER"):
                 exit(0)
-            cursor = msg
+            cursor_loc = msg
 
+
+
+        cursor_g.relocate(cursor_loc[0] * screen_width, cursor_loc[1] * screen_height)
+        cursor_r.relocate(cursor_loc[2] * screen_width, cursor_loc[3] * screen_height)
 
         time_passed = clock.tick()
         seconds = time_passed / 1000.0
@@ -128,12 +136,14 @@ if __name__ == "__main__":
         floor.render()
         block.render()
         player.render()
+        cursor_g.render()
+        cursor_r.render()
 
         health_text = myfont.render('Health: ' + str(health), False, (0, 0, 255))
-        print(cursor[0], cursor[1])
-        cursor_text = myfont.render('Loc: ' + str(int(cursor[0]*screen_width)) + " , " + str(int(cursor[1]*screen_height)), False, (0, 0, 255))
+        print(cursor_loc[0], cursor_loc[1])
+        # cursor_text = myfont.render('Loc: ' + str(int(cursor_loc[0]*screen_width)) + " , " + str(int(cursor_loc[1]*screen_height)), False, (0, 0, 255))
         screen.blit(health_text,(100, 100))
-        screen.blit(cursor_text, (100, 150))
+        # screen.blit(cursor_text, (100, 150))
         pygame.display.update()
         time.sleep(0.001)
 
