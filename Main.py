@@ -40,8 +40,8 @@ if __name__ == "__main__":
     jumping = False
     collapsing = False
 
-    floor_image = pygame.image.load('background.gif').convert()
-    floor = Sprite(screen_width, floor_height, [0, 0], [0, 0], [floor_image], 0, base , screen)
+    # floor_image = pygame.image.load('background.gif').convert()
+    # floor = Sprite(screen_width, floor_height, [0, 0], [0, 0], [floor_image], 0, base , screen)
 
     cursor_g_image = pygame.image.load('cursor_g.gif').convert()
     cursor_g = Sprite(8,8,[0,0],[0,0],[cursor_g_image], 0,0,screen)
@@ -57,10 +57,10 @@ if __name__ == "__main__":
     # game loop
 
 
-    memory = 0
-    write_end, read_end = Pipe()
-    green_proc = Process(target=main_a, args=(write_end,))
-    green_proc.start()
+    # memory = 0
+    # write_end, read_end = Pipe()
+    # green_proc = Process(target=main_a, args=(write_end,))
+    # green_proc.start()
     # detector_proc = Process(target = detector, args = (write_end,))
     # detector_proc.start()
 
@@ -76,14 +76,25 @@ if __name__ == "__main__":
             sys.exit()
         if(event.type == KEYDOWN):
             if(event.key == K_SPACE):
-                if(not jumping):
-                    player.speed_y = -jump_speed
-                    player.acc_y = gravity
-                    jumping = True
-                    player.setLock()
+                1
+                # if(not jumping):
+                #     player.speed_y = -jump_speed
+                #     player.acc_y = gravity
+                #     jumping = True
+                #     player.setLock()
+            elif(event.key == K_UP):
+                player.speed_y = -game_speed
+            elif (event.key == K_DOWN):
+                player.speed_y = game_speed
+            elif (event.key == K_LEFT):
+                player.speed_x = -game_speed
+            elif (event.key == K_RIGHT):
+                player.speed_x = game_speed
             elif(event.key == K_q):
                 sys.exit()
         elif(event.type == KEYUP):
+            player.speed_y = 0
+            player.speed_x = 0
             1
         #     1                               #nothing yet
 
@@ -98,16 +109,17 @@ if __name__ == "__main__":
         #             player.acc_y = gravity
         #             jumping = True
         #             player.setLock()
-        if(read_end.poll()):
-            msg = read_end.recv()
-            if(msg == "OVER"):
-                exit(0)
-            cursor_loc = msg
+
+        # if(read_end.poll()):
+        #     msg = read_end.recv()
+        #     if(msg == "OVER"):
+        #         exit(0)
+        #     cursor_loc = msg
 
 
 
-        cursor_g.relocate(cursor_loc[0] * screen_width, cursor_loc[1] * screen_height)
-        cursor_r.relocate(cursor_loc[2] * screen_width, cursor_loc[3] * screen_height)
+        # cursor_g.relocate(cursor_loc[0] * screen_width, cursor_loc[1] * screen_height)
+        # cursor_r.relocate(cursor_loc[2] * screen_width, cursor_loc[3] * screen_height)
 
         time_passed = clock.tick()
         seconds = time_passed / 1000.0
@@ -119,12 +131,12 @@ if __name__ == "__main__":
 
         if(block.x + block.width < 0):
             block.x = screen_width
-        if(player.collision(floor)):
-            player.y = base - player.height
-            jumping = False
-            player.speed_y = 0
-            player.acc_y = 0
-            player.releaseLock()
+        # if(player.collision(floor)):
+        #     player.y = base - player.height
+        #     jumping = False
+        #     player.speed_y = 0
+        #     player.acc_y = 0
+        #     player.releaseLock()
         if(player.collision(block) and not collapsing):
             collapsing = True
             health -= 1
@@ -133,11 +145,11 @@ if __name__ == "__main__":
 
         if(health == 0): break
         screen.fill(white)
-        floor.render()
+        # floor.render()
         block.render()
         player.render()
-        cursor_g.render()
-        cursor_r.render()
+        # cursor_g.render()
+        # cursor_r.render()
 
         health_text = myfont.render('Health: ' + str(health), False, (0, 0, 255))
         print(cursor_loc[0], cursor_loc[1])
@@ -148,7 +160,7 @@ if __name__ == "__main__":
         time.sleep(0.001)
 
 
-    green_proc.join()
+    # green_proc.join()
     # screen.fill(black)
     # over = myfont.render("Game Over", False, (255,0 ,0))
     # screen.blit(over, (screen_width / 2 - 30 , screen_height / 2))
