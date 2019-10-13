@@ -61,7 +61,7 @@ def predict_main(pipe, model):
     camera = cv2.VideoCapture(0)
 
     # region of interest (ROI) coordinates
-    top, right, bottom, left = 60, 350, 275, 590
+    top, right, bottom, left = 100, 350, 315, 590
 
     # initialize num of frames
     num_frames = 0
