@@ -33,19 +33,33 @@ def main():
     # cursor_r = Sprite(8, 8, [0, 0], [0, 0], [cursor_r_image], 0, 0, screen)
 
 
+
+
     ball_image = pygame.image.load("ball.gif").convert()
     radius = random.randint(50,90)
-    ball = Sprite(radius, radius, [random.randint(300,300), random.randint(300,300)], [random.randint(30, 60), random.randint(30, 60)],[ball_image], screen_width / 2, screen_height / 2, screen, Rect(0,0,screen_width, screen_height))
+    ball = Sprite(radius, radius, [random.randint(300,300), random.randint(300,300)], [random.randint(20, 40), random.randint(20, 40)],[ball_image], screen_width / 2, screen_height / 2, screen)
 
     gimg = pygame.image.load("player_g.gif").convert()
-    player_g = Sprite(random.randint(12,20), random.randint(40,48), [0,0], [0, 0],[gimg], 1024 * 7/8, 250 , screen, Rect(0,0,screen_width, screen_height))
+    player_g = Sprite(random.randint(12,20), random.randint(40,48), [0,0], [0, 0],[gimg], 1024 * 7/8, 250 , screen)
     rimg = pygame.image.load("player_r.gif").convert()
-    player_r = Sprite(random.randint(12,20), random.randint(40,48), [0, 0], [0, 0], [rimg], 1024/8, 250, screen, Rect(0, 0, screen_width, screen_height))
+    player_r = Sprite(random.randint(12,20), random.randint(40,48), [0, 0], [0, 0], [rimg], 1024/8, 250, screen)
 
     back_img = pygame.image.load("bg2.jpg").convert()
-    bg = Sprite(screen_width, screen_height, [0, 0], [0, 0], [back_img], 0, 0, screen, Rect(0, 0, screen_width, screen_height))
+    bg = Sprite(screen_width, screen_height, [0, 0], [0, 0], [back_img], 0, 0, screen)
+    back_img2 = pygame.image.load("background.jpg").convert()
+    bg2 = Sprite(screen_width, screen_height, [0, 0], [0, 0], [back_img2], 0, 0, screen)
+
+    play_img = pygame.image.load("play.jpg").convert()
+    plb = Sprite(256, 128, [0, 0], [0, 0], [play_img], 384, 192, screen)
+
+    cursor_g_image = pygame.image.load('cursor_g.gif').convert()
+    cursor_g = Sprite(8,8,[0,0],[0,0],[cursor_g_image], 10,10,screen)
+    cursor_r_image = pygame.image.load('cursor_r.gif').convert()
+    cursor_r = Sprite(8, 8, [0, 0], [0, 0], [cursor_r_image], 40, 40, screen)
+
 
     # game loop
+
 
 
 
@@ -55,7 +69,7 @@ def main():
     green_proc = Process(target=main_a, args=(write_end,))
     green_proc.start()
 
-    cursor_loc = (1024 * 7/8,250,1024/8,250)
+
 
     collide1 = False
     collide2 = False
@@ -63,6 +77,33 @@ def main():
     collide_l = False
     collide_r = False
     time.sleep(5)
+    cursor_loc = (0,0,0,0)
+    while (True):
+        event = pygame.event.poll()
+        if (event.type == QUIT):
+            sys.exit()
+        if (event.type == KEYDOWN):
+            if (event.key == K_s):
+                break
+        if (read_end.poll()):
+            msg = read_end.recv()
+            if (msg == "OVER"):
+                exit(0)
+            cursor_loc = msg
+
+        cursor_g.relocate(cursor_loc[0] * screen_width, cursor_loc[1] * screen_height)
+        cursor_r.relocate(cursor_loc[2] * screen_width, cursor_loc[3] * screen_height)
+        if(cursor_g.collision(plb) and cursor_r.collision(plb)):
+            break
+        bg2.render()
+        plb.render()
+        cursor_g.render()
+        cursor_r.render()
+
+        pygame.display.update()
+        time.sleep(0.001)
+
+    cursor_loc = (1024 * 7 / 8, 250, 1024 / 8, 250)
     while(True):
 
         event = pygame.event.poll()
@@ -74,17 +115,18 @@ def main():
             if(event.key == K_q):
                 break
 
+
         if(read_end.poll()):
             msg = read_end.recv()
             if(msg == "OVER"):
                 exit(0)
             cursor_loc = msg
 
+
         gx = max(screen_width / 2, cursor_loc[0] * screen_width)
         rx = min(screen_width / 2, cursor_loc[2] * screen_width)
         player_g.relocate(gx, cursor_loc[1] * screen_height)
         player_r.relocate(rx, cursor_loc[3] * screen_height)
-
         time_passed = clock.tick()
         seconds = time_passed / 1000.0
         ball.move(seconds)
@@ -147,4 +189,6 @@ def main():
 
 
 if __name__ == "__main__":
+
+
     main()

@@ -8,7 +8,7 @@ def normal_obstacles(split):
 class Sprite:
     fps = 0.04
     max_speed = 900
-    def __init__(self, width, height, speed, acceleration, images, x, y, screen, bound):
+    def __init__(self, width, height, speed, acceleration, images, x, y, screen):
         self.width = width
         self.height = height
         self.speed_x = speed[0]
@@ -25,7 +25,6 @@ class Sprite:
         self.frame_count = len(images)
         self.cum_secs = 0.0
         self.lock = True
-        self.bound = bound
     def render(self):
         self.screen.blit(self.images[self.current_frame], (self.x, self.y), (0, 0, self.width, self.height))
 
