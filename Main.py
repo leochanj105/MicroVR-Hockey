@@ -34,12 +34,13 @@ def main():
 
 
     ball_image = pygame.image.load("ball.gif").convert()
-    ball = Sprite(64, 64, [random.randint(300,300), random.randint(300,300)], [random.randint(30, 60), random.randint(30, 60)],[ball_image], screen_width / 2, screen_height / 2, screen, Rect(0,0,screen_width, screen_height))
+    radius = random.randint(50,90)
+    ball = Sprite(radius, radius, [random.randint(300,300), random.randint(300,300)], [random.randint(30, 60), random.randint(30, 60)],[ball_image], screen_width / 2, screen_height / 2, screen, Rect(0,0,screen_width, screen_height))
 
     gimg = pygame.image.load("player_g.gif").convert()
-    player_g = Sprite(16, 48, [0,0], [0, 0],[gimg], 1024 * 7/8, 250 , screen, Rect(0,0,screen_width, screen_height))
+    player_g = Sprite(random.randint(12,20), random.randint(40,48), [0,0], [0, 0],[gimg], 1024 * 7/8, 250 , screen, Rect(0,0,screen_width, screen_height))
     rimg = pygame.image.load("player_r.gif").convert()
-    player_r = Sprite(16, 48, [0, 0], [0, 0], [rimg], 1024/8, 250, screen, Rect(0, 0, screen_width, screen_height))
+    player_r = Sprite(random.randint(12,20), random.randint(40,48), [0, 0], [0, 0], [rimg], 1024/8, 250, screen, Rect(0, 0, screen_width, screen_height))
 
     back_img = pygame.image.load("bg2.jpg").convert()
     bg = Sprite(screen_width, screen_height, [0, 0], [0, 0], [back_img], 0, 0, screen, Rect(0, 0, screen_width, screen_height))
