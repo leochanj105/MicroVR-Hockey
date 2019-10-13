@@ -36,6 +36,7 @@ def main_a(pipe):
 	# otherwise, grab a reference to the video file
 	else:
 		vs = cv2.VideoCapture(args["video"])
+		
 
 	# allow the camera or video file to warm up
 	time.sleep(2.0)
@@ -45,6 +46,9 @@ def main_a(pipe):
 		time.sleep(0.01)
 
 		# grab the current frame
+		# print("width = vcap.get(cv2.cv.CV_CAP_PROP_FRAME_WIDTH)") 
+		# print("height = vcap.get(cv2.cv.CV_CAP_PROP_FRAME_HEIGHT")
+		
 		frame = vs.read()
 
 		# handle the frame from VideoCapture or VideoStream
@@ -57,6 +61,7 @@ def main_a(pipe):
 
 		# resize the frame, blur it, and convert it to the HSV
 		# color space
+		#600x336
 		frame = imutils.resize(frame, width=600)
 		blurred = cv2.GaussianBlur(frame, (11, 11), 0)
 		hsv = cv2.cvtColor(blurred, cv2.COLOR_BGR2HSV)
@@ -108,7 +113,7 @@ def main_a(pipe):
 			thickness = int(np.sqrt(args["buffer"] / float(i + 1)) * 2.5)
 			cv2.line(frame, pts[i - 1], pts[i], (0, 0, 255), thickness)
 			if(pipe is not None):
-				pipe.send(pts[i])
+				pipe.send((pts[i][0]/600,pts[i][1]/336))
 
 		# show the frame to our screen
 		cv2.imshow("Frame", frame)
