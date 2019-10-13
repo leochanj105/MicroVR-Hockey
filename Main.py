@@ -2,20 +2,19 @@ from Sprite import *
 from pygame.locals import *
 import time
 from multiprocessing import *
-from ContinuousGesturePredictor import *
-
+# from ContinuousGesturePredictor import *
+from ball_tracking import *
 
 if __name__ == "__main__": 
     #init
     pygame.init()
     pygame.font.init()
     myfont = pygame.font.SysFont('Comic Sans MS', 30)
+    clock = pygame.time.Clock()
 
     # hyper parameters
     screen_width = 1024
     screen_height = 768
-    size = screen_width, screen_height
-    speed = 0
     gravity = 700
     jump_speed = gravity * 0.6
     game_speed = 400
@@ -24,9 +23,10 @@ if __name__ == "__main__":
 
     floor_height = screen_height / 15
     base = screen_height / 2
-    health = 3
+    health = 100
+
     # set up
-    screen = pygame.display.set_mode(size)
+    screen = pygame.display.set_mode((screen_width, screen_height))
 
     x = screen_width / 4
     y = base - 100
@@ -35,7 +35,7 @@ if __name__ == "__main__":
     player_image2 = pygame.image.load("player2.gif").convert()
     player = Sprite(70, 100, [0, 0], [0, 0], [player_image, player_image2], x, y , screen)
 
-    clock = pygame.time.Clock()
+
 
     jumping = False
     collapsing = False
@@ -52,10 +52,16 @@ if __name__ == "__main__":
     block = Sprite(40, 60, [-game_speed, 0], [0, 0],[block_image], screen_width, base - 60 , screen)
     # game loop
 
+
     memory = 0
     write_end, read_end = Pipe()
-    detector_proc = Process(target = detector, args = (write_end,))
-    detector_proc.start()
+    green_proc = Process(target=main_a, args=(write_end,))
+    green_proc.start()
+    # detector_proc = Process(target = detector, args = (write_end,))
+    # detector_proc.start()
+
+
+
     while(True):
 
         event = pygame.event.poll()
@@ -63,31 +69,33 @@ if __name__ == "__main__":
         # print(event)
         if(event.type == QUIT):
             sys.exit()
-        # if(event.type == KEYDOWN):
-        #     if(event.key == K_SPACE):
-        #         if(not jumping):
-        #             player.speed_y = -jump_speed
-        #             player.acc_y = gravity
-        #             jumping = True
-        #             player.setLock()
-        #     elif(event.key == K_q):
-        #         sys.exit()
-        # elif(event.type == KEYUP):
-        #     1                               #nothing yet
-
-        msg = read_end.recv()
-        if(msg == "OVER"):
-        	exit(0)
-        elif(msg != memory):
-            memory = msg
-            if(msg == 2):
+        if(event.type == KEYDOWN):
+            if(event.key == K_SPACE):
                 if(not jumping):
                     player.speed_y = -jump_speed
                     player.acc_y = gravity
                     jumping = True
                     player.setLock()
+            elif(event.key == K_q):
+                sys.exit()
+        elif(event.type == KEYUP):
+            1
+        #     1                               #nothing yet
 
+        # msg = read_end.recv()
+        # if(msg == "OVER"):
+        # 	exit(0)
+        # elif(msg != memory):
+        #     memory = msg
+        #     if(msg == 2):
+        #         if(not jumping):
+        #             player.speed_y = -jump_speed
+        #             player.acc_y = gravity
+        #             jumping = True
+        #             player.setLock()
 
+        msg = read_end.recv()
+        cursor = msg
 
 
         time_passed = clock.tick()
@@ -119,22 +127,26 @@ if __name__ == "__main__":
         player.render()
 
         health_text = myfont.render('Health: ' + str(health), False, (0, 0, 255))
+        print(cursor[0], cursor[1])
+        cursor_text = myfont.render('Loc: ' + str(int(cursor[0]*screen_width)) + " , " + str(int(cursor[1]*screen_height)), False, (0, 0, 255))
         screen.blit(health_text,(100, 100))
+        screen.blit(cursor_text, (100, 150))
         pygame.display.update()
         time.sleep(0.001)
 
 
-    screen.fill(black)
-    over = myfont.render("Game Over", False, (255,0 ,0))
-    screen.blit(over, (screen_width / 2 - 30 , screen_height / 2))
-    pygame.display.update()
-
-
-
-    while(True):
-        event = pygame.event.poll()
-        if (event.type == QUIT):
-            sys.exit()
-        if (event.type == KEYDOWN):
-            if (event.key == K_q):
-                break
+    green_proc.join()
+    # screen.fill(black)
+    # over = myfont.render("Game Over", False, (255,0 ,0))
+    # screen.blit(over, (screen_width / 2 - 30 , screen_height / 2))
+    # pygame.display.update()
+    #
+    #
+    #
+    # while(True):
+    #     event = pygame.event.poll()
+    #     if (event.type == QUIT):
+    #         sys.exit()
+    #     if (event.type == KEYDOWN):
+    #         if (event.key == K_q):
+    #             break
