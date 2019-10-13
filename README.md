@@ -3,7 +3,7 @@ This is a <b>Micro VR</b> motion game based on webcam and openCV.
 
 
 ## Getting started
-The game requires two objects, one red and the other green.
+The game requires two objects, one red and the other green. The a.mp4 is a video demo.
 
 
 ### Pre-requieites
@@ -12,7 +12,8 @@ Python, openCV, PyGame requried.
 
 ### How to use
 Download the files and run python main.py. Use the two objects (red and green) as moving walls to play the table hockey.
-![VIDEO](a.mp4)
+![IMAGE](d1.png)
+![IMAGE](d2.png)
  
 
 
