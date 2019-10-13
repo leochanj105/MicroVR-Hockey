@@ -48,7 +48,7 @@ def main_a(pipe):
 
 	# keep looping
 	while True:
-		time.sleep(0.01)
+		time.sleep(0.001)
 
 		# grab the current frame
 		# print("width = vcap.get(cv2.cv.CV_CAP_PROP_FRAME_WIDTH)") 
@@ -107,12 +107,22 @@ def main_a(pipe):
 			M = cv2.moments(c)
 			center_green = (int(M["m10"] / M["m00"]), int(M["m01"] / M["m00"]))
 
+			center_green_x_pos = 1.0 - center_green[0] / 600
+			center_green_y_pos = center_green[1] / 340
+			center_green_x_pos = min(max(0.0, center_green_x_pos), 1.0)
+			center_green_y_pos = min(max(0.0, center_green_y_pos), 1.0)
+
 			d = max(cnts_red, key=cv2.contourArea)
 			((x1, y1), radius1) = cv2.minEnclosingCircle(d)
 			N = cv2.moments(d)
 			center_red = (int(N["m10"] / N["m00"]), int(N["m01"] / N["m00"]))
 			
-			pipe.send((center_red[0]/600, center_red[1]/340, center_green[0]/600, center_green[1]/340))
+			center_red_x_pos = 1.0 - center_red[0] / 600
+			center_red_y_pos = center_red[1] / 340
+			center_red_x_pos = min(max(0.0, center_red_x_pos), 1.0)
+			center_red_y_pos = min(max(0.0, center_red_y_pos), 1.0)
+
+			pipe.send((center_green_x_pos, center_green_y_pos, center_red_x_pos, center_red_y_pos))
 
 			# only proceed if the radius meets a minimum size
 			if radius > 10:
@@ -181,3 +191,4 @@ def main_a(pipe):
 
 	# close all windows
 	cv2.destroyAllWindows()
+	pipe.send("OVER")

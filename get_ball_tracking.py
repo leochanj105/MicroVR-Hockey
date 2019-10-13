@@ -13,10 +13,13 @@ if __name__ == "__main__":
 
 	p1 = multiprocessing.Process(target=main_a, args=(parent_conn_1, ))
 	p1.start()
+	result = None
 	while(True):
 		time.sleep(0.001)
-		result = child_conn.recv()
-    
+		if(child_conn.poll()):
+				result =child_conn.recv()
+		print(result)
+
 	# running processes
 
     # wait until processes finish 
