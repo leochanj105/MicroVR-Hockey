@@ -11,11 +11,16 @@ if __name__ == "__main__":
 
 	# creating new processes
 
-	p1 = multiprocessing.Process(target=main_a, args=(parent_conn,))
+
+	# values =  multiprocessing.Array('d', 2)
+	# value = multiprocessing.Value('i')
+	p1 = multiprocessing.Process(target=main_a, args=(parent_conn, ))
 	p1.start()
+	result = None
 	while(True):
 		time.sleep(0.001)
-		result = child_conn.recv()
+		if(child_conn.poll()):
+				result =child_conn.recv()
 		print(result)
     
 	# running processes

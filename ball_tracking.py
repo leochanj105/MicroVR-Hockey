@@ -90,7 +90,13 @@ def main_a(pipe):
 			((x, y), radius) = cv2.minEnclosingCircle(c)
 			M = cv2.moments(c)
 			center = (int(M["m10"] / M["m00"]), int(M["m01"] / M["m00"]))
+			x_pos = 1.0 - center[0] / 600
+			y_pos = center[1] / 340
+			x_pos = min(max(0.0, x_pos), 1.0)
+			y_pos = min(max(0.0, y_pos), 1.0)
+			pipe.send((x_pos, y_pos))
 
+			# pipe.send((x_pos, y_pos))
 			# only proceed if the radius meets a minimum size
 			if radius > 10:
 				# draw the circle and centroid on the frame,
@@ -113,8 +119,8 @@ def main_a(pipe):
 			# draw the connecting lines
 			thickness = int(np.sqrt(args["buffer"] / float(i + 1)) * 2.5)
 			cv2.line(frame, pts[i - 1], pts[i], (0, 0, 255), thickness)
-			if(pipe is not None):
-				pipe.send((pts[i][0]/600,pts[i][1]/340))
+
+
 
 		# show the frame to our screen
 		cv2.imshow("Frame", frame)
@@ -122,6 +128,7 @@ def main_a(pipe):
 
 		# if the 'q' key is pressed, stop the loop
 		if key == ord("q"):
+			pipe.send("OVER")
 			break
 
 	# if we are not using a video file, stop the camera video stream
@@ -134,3 +141,4 @@ def main_a(pipe):
 
 	# close all windows
 	cv2.destroyAllWindows()
+	pipe.send("OVER")

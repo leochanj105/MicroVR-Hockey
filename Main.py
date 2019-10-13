@@ -60,6 +60,7 @@ if __name__ == "__main__":
     # detector_proc = Process(target = detector, args = (write_end,))
     # detector_proc.start()
 
+    cursor = (0,0)
 
 
     while(True):
@@ -93,9 +94,11 @@ if __name__ == "__main__":
         #             player.acc_y = gravity
         #             jumping = True
         #             player.setLock()
-
-        msg = read_end.recv()
-        cursor = msg
+        if(read_end.poll()):
+            msg = read_end.recv()
+            if(msg == "OVER"):
+                exit(0)
+            cursor = msg
 
 
         time_passed = clock.tick()
