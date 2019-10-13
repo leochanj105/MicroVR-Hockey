@@ -12,8 +12,7 @@ Python, openCV, PyGame requried.
 
 ### How to use
 Download the files and run python main.py. Use the two objects (red and green) as moving walls to play the table hockey.
-
-
+![VIDEO](a.mp4)
  
 
 
