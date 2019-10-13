@@ -41,7 +41,8 @@ def main():
     rimg = pygame.image.load("player_r.gif").convert()
     player_r = Sprite(16, 48, [0, 0], [0, 0], [rimg], 1024/8, 250, screen, Rect(0, 0, screen_width, screen_height))
 
-
+    back_img = pygame.image.load("bg2.jpg").convert()
+    bg = Sprite(screen_width, screen_height, [0, 0], [0, 0], [back_img], 0, 0, screen, Rect(0, 0, screen_width, screen_height))
 
     # game loop
 
@@ -123,7 +124,10 @@ def main():
             ball.y = min(max(0, ball.y), screen_height - ball.height)
             ball.speed_y = -ball.speed_y
 
-        screen.fill((255,255,255))
+        # screen.fill((255,255,255))
+        # screen.blit(back_img,(0,0,screen_width, screen_height))
+
+        bg.render()
         ball.render()
         player_g.render()
         player_r.render()

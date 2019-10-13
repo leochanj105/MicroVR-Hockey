@@ -26,7 +26,6 @@ class Sprite:
         self.cum_secs = 0.0
         self.lock = True
         self.bound = bound
-        print(bound)
     def render(self):
         self.screen.blit(self.images[self.current_frame], (self.x, self.y), (0, 0, self.width, self.height))
 
