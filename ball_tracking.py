@@ -62,7 +62,7 @@ def main_a(pipe):
 		frame = vs.read()
 
 		# handle the frame from VideoCapture or VideoStream
-		frame = frame[1] if args.get("video", False) else frameq
+		frame = frame[1] if args.get("video", False) else frame
 
 		# if we are viewing a video and we did not grab a frame,
 		# then we have reached the end of the video
