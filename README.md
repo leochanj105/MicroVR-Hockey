@@ -10,6 +10,7 @@ The game requires two gloves / objects, one red and the other green. The a.mp4 i
 
 ### Pre-requieites
 Python, openCV, PyGame requried.
+<b>#Also be sure to turn your webcam on !!!!!<b/>
 
 
 ### How to use
